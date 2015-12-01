@@ -9,13 +9,15 @@ class Meepfile {
    * @param {object} payload - Payload containing server object as well as tasks and an output function.
    */
   constructor(payload) {
-    this.server     = payload.server;
-    this.tasks      = payload.tasks;
-    this.output     = payload.output;
+    this.server       = payload.server;
+    this.tasks        = payload.tasks;
+    this.output       = payload.output;
 
-    this.test      = (payload.test) ? payload.test : false;
-    this.conn       = new Client();
-    this.tasks_run  = false;
+    this.conn         = new Client();
+    this.connected    = false;
+    this.tasks_run    = false;
+    this.readyToTest  = false;
+    this.test         = (payload.test) ? payload.test : false;
   }
 
   /**
@@ -36,34 +38,42 @@ class Meepfile {
   * Run the tasks provided to Meepfile.
   */
   run() {
-    this.tasks.map((task)=> {
-      let tasks_completed = 0;
+    let that = this;
+    (function task_map(index){
+      if(index < that.tasks.length) {
+        let task = that.tasks[index];
+        let tasks_completed = 0;
 
-      this.conn.exec(task, (err, stream)=> {
+        that.conn.exec(task, (err, stream)=> {
 
-        if (err) throw err;
-        stream.on('close', (code, signal)=> {
+          if (err) throw err;
+          stream.on('close', (code, signal)=> {
 
-          tasks_completed++;
+            tasks_completed++;
 
-          if(tasks_completed >= this.tasks.length && !this.test) {
-            this.conn.end();
-          }
+            if(tasks_completed >= (that.tasks.length - 1)) {
+              if( that.test ) {
+                that.readyToTest = true;
+              }else {
+                that.conn.end();
+              }
+            }
 
-          this.output(false, 'Stream :: close :: code: ' + code + ', signal: ' + signal);
+            that.output(false, 'Stream :: close :: code: ' + code + ', signal: ' + signal);
+            task_map(index + 1);
 
-        }).on('data', (data)=> {
+          }).on('data', (data)=> {
 
-          this.output(false, 'STDOUT: ' + data);
+            that.output(false, data.toString());
 
-        }).stderr.on('data', (data)=> {
+          }).stderr.on('data', (data)=> {
 
-          this.output('error', 'STDERR: ' + data);
+            that.output('error', 'STDERR: ' + data);
 
+          });
         });
-      });
-
-    });
+      }
+    })(0);
   }
 
   /**
@@ -71,27 +81,37 @@ class Meepfile {
   */
   expect(command) {
     // Just a simple regex test for now.
-    let match = function(expression, callback) {
-      this.conn.exec(task, (err, stream)=> {
+    var that = this;
+    let match = (expression, callback)=> {
+      (function wait() {
+        if(that.readyToTest) {
+          that.conn.exec(command, (err, stream)=> {
 
-        if (err) throw err;
-        stream.on('close', (code, signal)=> {
+            if (err) throw err;
+            stream.on('close', (code, signal)=> {
 
-        }).on('data', (data)=> {
+            }).on('data', (data)=> {
 
-          let condition = data.match(expression);
-          
-          callback(condition);
-          this.conn.end();
+              let condition = data.toString().match(expression);
 
-          this.output(false, 'STDOUT: ' + data);
+              callback(condition);
+              that.conn.end();
 
-        }).stderr.on('data', (data)=> {
+              that.output(false, 'STDOUT: ' + data);
 
-          this.output('error', 'STDERR: ' + data);
+            }).stderr.on('data', (data)=> {
 
-        });
-      });
+              that.output('error', 'STDERR: ' + data);
+
+            });
+          });
+        } else {
+          setTimeout( wait, 500 );
+        }
+      })();
+    };
+    return {
+      match
     };
   }
 
@@ -101,6 +121,7 @@ class Meepfile {
   meep() {
     this.output('Meep. Meep.');
     this.connect();
+    return this;
   }
 }
 
