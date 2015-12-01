@@ -1,0 +1,22 @@
+{
+  "name": "meep-meepfile",
+  "version": "1.0.0",
+  "description": "Object used to configure, setup and launch applications on linux based servers.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MeepGroup/meep-meepfile.git"
+  },
+  "author": "wski <contact.mattdylan@gmail.com>",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/MeepGroup/meep-meepfile/issues"
+  },
+  "homepage": "https://github.com/MeepGroup/meep-meepfile",
+  "dependencies": {
+    "ssh2": "^0.4.12"
+  }
+}
