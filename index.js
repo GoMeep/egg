@@ -42,7 +42,7 @@ class Egg {
     (function task_map(index){
       if(index < that.tasks.length) {
         let task = that.tasks[index];
-        let tasks_completed = 0;
+        let tasks_completed = 1;
 
         that.conn.exec(task, (err, stream)=> {
 
@@ -51,7 +51,7 @@ class Egg {
 
             tasks_completed++;
 
-            if(tasks_completed >= (that.tasks.length - 1)) {
+            if(tasks_completed >= that.tasks.length) {
               if( that.test ) {
                 that.readyToTest = true;
               }else {
@@ -116,9 +116,9 @@ class Egg {
   }
 
   /**
-  * Run the Egg. Meep. Meep.
+  * Hatch the Egg. Meep. Meep.
   */
-  meep() {
+  hatch() {
     this.output('Meep. Meep.');
     this.connect();
     return this;

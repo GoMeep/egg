@@ -1,30 +1,28 @@
-# Meepfile
+# Egg
+The egg is a hatchable little package that can be used on a nest to build and deploy software and apps.
+It supports authentication, task running, and simple testing.
+
+A basic usage example is provided below.
 
 ## Usage
 
 ```javascript
-var Meepfile = require('meep-meepfile');
-var meep = new Meepfile({
+var Egg = require('meep-meepfile');
+var egg = new Egg({
   server: {
-    host: '192.167.0.4',
+    host: '192.0.0.1',
     user: 'root',
-    password: 'psw123',
+    password: 'password',
     port: 22
   },
   tasks: [
     'curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -',
     'apt-get install -y nodejs'
   ],
-  test: true,
-  output: function(err, msg) {
-    if(err) {
-      console.log(err);
-    }
-    console.log(msg);
-  }
+  test: true
 });
 
-meep.meep().expect('node -v').match(new RegExp(/v4\..*\..*/), (res)=>{
+egg.hatch().expect('node -v').match(new RegExp(/v4\..*\..*/), (res)=>{
   if(typeof(res) !== 'null') {
     console.log(`Tests passed, Node version ${res[0]} installed.`);
   }
