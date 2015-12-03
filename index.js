@@ -2,10 +2,10 @@
 
 const Client = require('ssh2').Client;
 
-/** Class representing a Meepfile. */
-class Meepfile {
+/** Class representing a Egg. */
+class Egg {
   /**
-   * Create a Meepfile.
+   * Create a Egg.
    * @param {object} payload - Payload containing server object as well as tasks and an output function.
    */
   constructor(payload) {
@@ -35,7 +35,7 @@ class Meepfile {
   }
 
   /**
-  * Run the tasks provided to Meepfile.
+  * Run the tasks provided to Egg.
   */
   run() {
     let that = this;
@@ -116,7 +116,7 @@ class Meepfile {
   }
 
   /**
-  * Run the Meepfile. Meep. Meep.
+  * Run the Egg. Meep. Meep.
   */
   meep() {
     this.output('Meep. Meep.');
@@ -125,4 +125,4 @@ class Meepfile {
   }
 }
 
-module.exports = Meepfile;
+module.exports = Egg;
