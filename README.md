@@ -2,6 +2,8 @@
 The egg is a hatchable little package that can be used on a nest to build and deploy software and apps.
 It supports authentication, task running, and simple testing.
 
+You can also use `meep-egg-layer` to generate an Egg.
+
 A basic usage example is provided below.
 
 ## Usage
