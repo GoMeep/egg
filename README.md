@@ -7,7 +7,7 @@ A basic usage example is provided below.
 ## Usage
 
 ```javascript
-var Egg = require('meep-meepfile');
+var Egg = require('meep-egg');
 var egg = new Egg({
   server: {
     host: '192.0.0.1',
