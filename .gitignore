@@ -1,2 +1,8 @@
 node_modules
 test.js
+
+.ssh
+.npmrc
+.muttrc
+.gitconfig
+.netrc

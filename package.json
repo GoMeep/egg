@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/MeepGroup/meep-meepfile",
   "dependencies": {
+    "progress": "^1.1.8",
     "ssh2": "^0.4.12"
   }
 }

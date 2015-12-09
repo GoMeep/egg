@@ -1,5 +1,5 @@
 'use strict';
-
+const ProgressBar = require('progress');
 const Client = require('ssh2').Client;
 
 /** Class representing a Egg. */
@@ -11,13 +11,15 @@ class Egg {
   constructor(payload) {
     this.server       = payload.server;
     this.tasks        = payload.tasks;
-    this.output       = payload.output;
-
+    this.output       = (payload.output) ? payload.output : (m) => {} ;
+    
     this.conn         = new Client();
     this.connected    = false;
     this.tasks_run    = false;
     this.readyToTest  = false;
     this.test         = (payload.test) ? payload.test : false;
+    
+    this.tasks_step   = 1; 
   }
 
   /**
@@ -38,29 +40,38 @@ class Egg {
   * Run the tasks provided to Egg.
   */
   run() {
+    console.log();
+    let bar = new ProgressBar('Installing [:bar] :percent :etas', {
+      complete: '=',
+      incomplete: ' ',
+      width: 20,
+      total: this.tasks.length
+    });
     let that = this;
+    
     (function task_map(index){
       if(index < that.tasks.length) {
         let task = that.tasks[index];
-        let tasks_completed = 1;
 
         that.conn.exec(task, (err, stream)=> {
 
-          if (err) throw err;
+          if (err) that.output(true, err);
           stream.on('close', (code, signal)=> {
+            
+            bar.tick(1);
 
-            tasks_completed++;
-
-            if(tasks_completed >= that.tasks.length) {
+            if(that.tasks_step === that.tasks.length) {
+              console.log('Done.');
               if( that.test ) {
                 that.readyToTest = true;
+                console.log('Running tests...');
               }else {
                 that.conn.end();
               }
+            } else{
+              that.tasks_step = that.tasks_step + 1;
+              task_map(index + 1);
             }
-
-            that.output(false, 'Stream :: close :: code: ' + code + ', signal: ' + signal);
-            task_map(index + 1);
 
           }).on('data', (data)=> {
 
@@ -68,7 +79,7 @@ class Egg {
 
           }).stderr.on('data', (data)=> {
 
-            that.output('error', 'STDERR: ' + data);
+            that.output(false, data.toString());
 
           });
         });
@@ -86,14 +97,12 @@ class Egg {
       (function wait() {
         if(that.readyToTest) {
           that.conn.exec(command, (err, stream)=> {
-
             if (err) throw err;
             stream.on('close', (code, signal)=> {
 
             }).on('data', (data)=> {
-
               let condition = data.toString().match(expression);
-
+              
               callback(condition);
               that.conn.end();
 
