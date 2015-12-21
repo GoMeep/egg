@@ -12,14 +12,16 @@ class Egg {
     this.server       = payload.server;
     this.tasks        = payload.tasks;
     this.output       = (payload.output) ? payload.output : (m) => {} ;
-    
+
     this.conn         = new Client();
     this.connected    = false;
     this.tasks_run    = false;
     this.readyToTest  = false;
     this.test         = (payload.test) ? payload.test : false;
-    
-    this.tasks_step   = 1; 
+
+    this.tickCallback = (payload.tickCallback) ? payload.tickCallback : () => {};
+
+    this.tasks_step   = 1;
   }
 
   /**
@@ -48,7 +50,7 @@ class Egg {
       total: this.tasks.length
     });
     let that = this;
-    
+
     (function task_map(index){
       if(index < that.tasks.length) {
         let task = that.tasks[index];
@@ -57,8 +59,9 @@ class Egg {
 
           if (err) that.output(true, err);
           stream.on('close', (code, signal)=> {
-            
+
             bar.tick(1);
+            that.tickCallback(1, that.tasks.length);
 
             if(that.tasks_step === that.tasks.length) {
               console.log('Done.');
@@ -102,7 +105,7 @@ class Egg {
 
             }).on('data', (data)=> {
               let condition = data.toString().match(expression);
-              
+
               callback(condition);
               that.conn.end();
 
