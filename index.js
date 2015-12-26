@@ -2,6 +2,16 @@
 const ProgressBar = require('progress');
 const Client = require('ssh2').Client;
 
+const genPass = function (length) {
+    var chars = "abcdefghijklmnopqrstuvwxyz!@#$%^&*()-+<>ABCDEFGHIJKLMNOP1234567890";
+    var pass = "";
+    for (var x = 0; x < length; x++) {
+        var i = Math.floor(Math.random() * chars.length);
+        pass += chars.charAt(i);
+    }
+    return pass;
+}
+
 /** Class representing a Egg. */
 class Egg {
   /**
@@ -18,6 +28,7 @@ class Egg {
     this.tasks_run    = false;
     this.readyToTest  = false;
     this.test         = (payload.test) ? payload.test : false;
+    this.password     = genPass(8);
 
     this.tickCallback = (payload.tickCallback) ? payload.tickCallback : () => {};
 
@@ -67,7 +78,6 @@ class Egg {
               console.log('Done.');
               if( that.test ) {
                 that.readyToTest = true;
-                console.log('Running tests...');
               }else {
                 that.conn.end();
               }
@@ -130,7 +140,8 @@ class Egg {
   /**
   * Hatch the Egg. Meep. Meep.
   */
-  hatch() {
+  hatch(callback) {
+    callback({ password: this.password });
     this.output('Meep. Meep.');
     this.connect();
     return this;

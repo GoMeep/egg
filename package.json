@@ -1,6 +1,6 @@
 {
-  "name": "meep-meepfile",
-  "version": "1.0.0",
+  "name": "meep-egg",
+  "version": "1.1.0",
   "description": "Object used to configure, setup and launch applications on linux based servers.",
   "main": "index.js",
   "scripts": {
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/MeepGroup/meep-meepfile.git"
+    "url": "https://github.com/MeepGroup/meep-egg.git"
   },
   "author": "wski <contact.mattdylan@gmail.com>",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/MeepGroup/meep-meepfile/issues"
+    "url": "https://github.com/MeepGroup/meep-egg/issues"
   },
-  "homepage": "https://github.com/MeepGroup/meep-meepfile",
+  "homepage": "https://github.com/MeepGroup/meep-egg",
   "dependencies": {
     "progress": "^1.1.8",
     "ssh2": "^0.4.12"
